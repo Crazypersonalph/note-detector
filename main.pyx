@@ -19,7 +19,7 @@ p = pyaudio.PyAudio()
 N = 8096
 sample_rate = 48000
 
-data = np.zeros(N, dtype=np.float32)
+data = np.zeros(N, dtype=np.float64)
 
 def close_figure(event):
     """
@@ -53,7 +53,7 @@ stream.start_stream()
 plt.ion() # Start the graph
 fig, ax = plt.subplots()
 graph, = ax.plot([], [])
-ax.set_xlim(0, sample_rate / 2)
+ax.set_xlim(0, sample_rate/2)
 ax.set_ylim(0, 5)
 ax.set_title('Realtime FFT of Audio Input')
 ax.set_xlabel('Frequency (Hz)')
@@ -61,13 +61,15 @@ ax.set_ylabel('Amplitude')
 
 fig.canvas.mpl_connect('key_press_event', close_figure)
 
-window = scipy.signal.windows.hann(N)
-fft_freq = pyfftw.interfaces.numpy_fft.fftfreq(N, d=1/sample_rate) # Get the frequency bins
+zero_pad = 28 * N
+
+window = scipy.signal.windows.blackmanharris(N)
+fft_freq = pyfftw.interfaces.numpy_fft.fftfreq(zero_pad, d=1/sample_rate) # Get the frequency bins
 
 while stream.is_active():
     windowed_data = data * window
 
-    fft_data = abs(pyfftw.interfaces.numpy_fft.fft(windowed_data)) # Get the FFT data
+    fft_data = abs(pyfftw.interfaces.numpy_fft.fft(windowed_data, n=zero_pad)) # Get the FFT data
 
     dominant_freq = abs(fft_freq[np.argmax(fft_data)]) # Grab the fundamental frequency
     print(f"Dominant frequency is {dominant_freq:.2f} Hz")
