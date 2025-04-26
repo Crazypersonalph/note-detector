@@ -5,12 +5,14 @@ import pyaudio
 import numpy as np
 import matplotlib.pyplot as plt
 
+import multiprocessing
+
 import scipy.signal
 
 import pyfftw
 
 
-pyfftw.config.NUM_THREADS = 4
+pyfftw.config.NUM_THREADS = multiprocessing.cpu_count()
 
 pyfftw.config.PLANNER_EFFORT = 'FFTW_ESTIMATE'
 
