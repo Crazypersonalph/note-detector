@@ -5,12 +5,21 @@ import pyaudio
 import numpy as np
 import matplotlib.pyplot as plt
 
+import scipy.signal
+
+import pyfftw
+
+
+pyfftw.config.NUM_THREADS = 4
+
+pyfftw.config.PLANNER_EFFORT = 'FFTW_ESTIMATE'
+
 p = pyaudio.PyAudio()
 
-data = np.zeros(8096, dtype=np.float32)
-
-N = 12288
+N = 8096
 sample_rate = 48000
+
+data = np.zeros(N, dtype=np.float32)
 
 def close_figure(event):
     """
@@ -52,13 +61,13 @@ ax.set_ylabel('Amplitude')
 
 fig.canvas.mpl_connect('key_press_event', close_figure)
 
+window = scipy.signal.windows.hann(N)
+fft_freq = pyfftw.interfaces.numpy_fft.fftfreq(N, d=1/sample_rate) # Get the frequency bins
 
 while stream.is_active():
-    window = np.hanning(len(data)) # Implement Hanning window to reduce noise
     windowed_data = data * window
 
-    fft_data = abs(np.fft.fft(windowed_data)) # Get the FFT data
-    fft_freq = np.fft.fftfreq(len(fft_data), d=1/sample_rate) # Get the frequency bins
+    fft_data = abs(pyfftw.interfaces.numpy_fft.fft(windowed_data)) # Get the FFT data
 
     dominant_freq = abs(fft_freq[np.argmax(fft_data)]) # Grab the fundamental frequency
     print(f"Dominant frequency is {dominant_freq:.2f} Hz")
@@ -67,7 +76,7 @@ while stream.is_active():
     graph.set_xdata(fft_freq)
 
     plt.draw()
-    plt.pause(0.01)
+    plt.pause(0.001)
 
 plt.close('all') # Clean up
 stream.close()

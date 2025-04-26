@@ -5,4 +5,6 @@ Useful for getting the frequencies of a note, tuning instruments, etc.
 
 I might get around to updating it with more features some time.
 
+Run `python index.py` to go!
+
 Kind Regards,<br>Alphons Joseph
