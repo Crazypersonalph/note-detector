@@ -16,7 +16,7 @@ pyfftw.config.PLANNER_EFFORT = 'FFTW_ESTIMATE'
 
 p = pyaudio.PyAudio()
 
-N = 8096
+N = 16384
 sample_rate = 48000
 
 data = np.zeros(N, dtype=np.float64)
@@ -54,7 +54,7 @@ plt.ion() # Start the graph
 fig, ax = plt.subplots()
 graph, = ax.plot([], [])
 ax.set_xlim(0, sample_rate/2)
-ax.set_ylim(0, 5)
+ax.set_ylim(0, 50)
 ax.set_title('Realtime FFT of Audio Input')
 ax.set_xlabel('Frequency (Hz)')
 ax.set_ylabel('Amplitude')
